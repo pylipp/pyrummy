@@ -1,6 +1,7 @@
 import unittest
+from collections import deque
 
-from pyrummy.chips import Chip
+from pyrummy.chips import Chip, Book, Run
 
 
 class ChipTestCase(unittest.TestCase):
@@ -14,6 +15,38 @@ class ChipTestCase(unittest.TestCase):
         chip = Chip.from_str("b10")
         self.assertEqual(hash(chip), 842)
         self.assertEqual(chip.location, Chip.POOL)
+
+    def test_eq(self):
+        self.assertEqual(Chip.from_str("Y05"), Chip(Chip.YELLOW, 5))
+
+class BookTestCase(unittest.TestCase):
+    def test_two_chip_book(self):
+        book = Book(Chip.from_str("k11"), Chip.from_str("y11"))
+        candidates = list(book.candidates())
+        self.assertListEqual(candidates, [Chip.from_str("r11"),
+            Chip.from_str("b11")])
+        self.assertEqual(book.value, 22)
+
+    def test_four_chip_book(self):
+        book = Book(*[Chip(color, 4) for color in range(Chip.NR_COLORS)])
+        candidates = list(book.candidates())
+        self.assertEqual(0, len(candidates))
+
+class RunTestCase(unittest.TestCase):
+    def test_init_sort(self):
+        run = Run(Chip.from_str("r9"), Chip.from_str("r8"), Chip.from_str("r10"))
+        self.assertEqual(run, deque([Chip.from_str("r8"), Chip.from_str("r9"),
+            Chip.from_str("r10")]))
+
+    def test_candidates(self):
+        run = Run(Chip.from_str("r9"), Chip.from_str("r8"), Chip.from_str("r10"))
+        candidates = list(run.candidates())
+        self.assertListEqual(candidates, [Chip.from_str("r11"),
+            Chip.from_str("r7")])
+
+    def test_no_candidates(self):
+        run = Run(*[Chip(Chip.BLACK, v) for v in range(Chip.MAX_VALUE, 0, -1)])
+        self.assertEqual(0, len(list(run.candidates())))
 
 if __name__ == "__main__":
     unittest.main()

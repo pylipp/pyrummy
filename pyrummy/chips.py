@@ -1,3 +1,6 @@
+from abc import ABCMeta, abstractmethod
+from collections import deque
+from operator import attrgetter
 
 
 class Chip(object):
@@ -50,3 +53,43 @@ class Chip(object):
 
     def __eq__(self, other):
         return self._color == other._color and self._value == other._value
+
+
+class Combination(object):
+
+    __metaclass__ = ABCMeta
+
+    @property
+    def value(self):
+        return sum([chip.value for chip in self])
+
+    @abstractmethod
+    def candidates(self):
+        pass
+
+
+class Book(set, Combination):
+
+    def __init__(self, *args):
+        super().__init__(args)
+        self._chip_value = args[0].value
+
+    def candidates(self):
+        all_colors = set(range(Chip.NR_COLORS))
+        self_colors = set([chip.color for chip in self])
+        for color in all_colors.difference(self_colors):
+            yield Chip(color, self._chip_value)
+
+
+class Run(deque, Combination):
+
+    def __init__(self, *args):
+        super().__init__(sorted(list(args), key=attrgetter("value")))
+        self._chip_color = args[0].color
+
+    def candidates(self):
+        if self[-1].value < Chip.MAX_VALUE:
+            yield Chip(self._chip_color, self[-1].value + 1)
+        if self[0].value > 1:
+            yield Chip(self._chip_color, self[0].value - 1)
+
