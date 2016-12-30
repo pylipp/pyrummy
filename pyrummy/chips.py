@@ -70,6 +70,15 @@ class Chip(object):
     def __eq__(self, other):
         return self._color == other._color and self._value == other._value
 
+    def candidates(self):
+        all_colors = set(range(Chip.NR_COLORS))
+        for color in all_colors.difference({self._color}):
+            yield Chip(color, self._value)
+        if self._value < Chip.MAX_VALUE:
+            yield Chip(self._color, self._value + 1)
+        if self._value > 1:
+            yield Chip(self._color, self._value - 1)
+
 
 class Combination(object):
 

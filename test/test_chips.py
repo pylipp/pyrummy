@@ -19,6 +19,18 @@ class ChipTestCase(unittest.TestCase):
     def test_eq(self):
         self.assertEqual(Chip.from_str("Y05"), Chip(Chip.YELLOW, 5))
 
+    def test_candidates(self):
+        chip = Chip.from_str("r1")
+        self.assertSetEqual(set(chip.candidates()),
+                set([Chip.from_str("y1"), Chip.from_str("b1"),
+                    Chip.from_str("k1"), Chip.from_str("r2")]))
+
+    def test_all_candidates(self):
+        chip = Chip.from_str("r2")
+        self.assertSetEqual(set(chip.candidates()),
+                set([Chip.from_str("y2"), Chip.from_str("b2"),
+                    Chip.from_str("k2"), Chip.from_str("r3"), Chip.from_str("r1")]))
+
 class BookTestCase(unittest.TestCase):
     def test_two_chip_book(self):
         book = Book(Chip.from_str("k11"), Chip.from_str("y11"))
