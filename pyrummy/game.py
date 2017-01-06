@@ -97,7 +97,9 @@ class Player(object):
             # TODO: search rest for combinations longer than 3 chips
             constellation.rest = [c for c in pool if c not in
                     constellation.combination_chips()]
-            constellations.add(constellation)
+            # add constellation if it meets the threshold
+            if constellation.value >= Game.THRESHOLD:
+                constellations.add(constellation)
 
         # TODO: best constellation is actually the one that contains most chips
         constellations = list(constellations)
@@ -111,3 +113,7 @@ class Player(object):
             self._hand.remove(c)
 
         # TODO: determine chip to drop from constellation rest
+
+class Game(object):
+
+    THRESHOLD = 40

@@ -1,7 +1,7 @@
 import unittest
 
 from pyrummy.chips import Chip, Book
-from pyrummy.game import Player
+from pyrummy.game import Player, Game
 
 
 class PlayerInitTestCase(unittest.TestCase):
@@ -27,6 +27,7 @@ class PlayerSimplePlayTestCase(unittest.TestCase):
         player = Player(0, [
             Chip.from_str("b8"), Chip.from_str("b7"),
             Chip.from_str("r7"), Chip.from_str("y7")])
+        Game.THRESHOLD = 0
         player.play()
         book = player._yard[0]
         self.assertEqual(1, len(player._yard))
@@ -44,6 +45,7 @@ class PlayerSimplePlayTestCase(unittest.TestCase):
             Chip.from_str("b8"), Chip.from_str("y8"),
             Chip.from_str("y7"), Chip.from_str("y6"),
             Chip.from_str("k11"), Chip.from_str("b2"), Chip.from_str("b1")])
+        Game.THRESHOLD = 40
         player.play()
         combi = player._yard[0]
         # algorithm picks either r987 or rby8
@@ -54,9 +56,19 @@ class PlayerSimplePlayTestCase(unittest.TestCase):
         player = Player(0, [
             Chip.from_str("y2", index=0), Chip.from_str("y3"), Chip.from_str("y4"),
             Chip.from_str("y2", index=1), Chip.from_str("r2"), Chip.from_str("k2")])
+        Game.THRESHOLD = 10
         player.play()
         self.assertEqual(2, len(player._yard))
         self.assertEqual(0, len(player._hand))
+
+    def test_below_threshold(self):
+        player = Player(0, [
+            Chip.from_str("y2", index=0), Chip.from_str("y3"), Chip.from_str("y4"),
+            Chip.from_str("y2", index=1), Chip.from_str("r2"), Chip.from_str("k2")])
+        Game.THRESHOLD = 20
+        player.play()
+        self.assertEqual(0, len(player._yard))
+        self.assertEqual(6, len(player._hand))
 
 if __name__ == "__main__":
     unittest.main()
