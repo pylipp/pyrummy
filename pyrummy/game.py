@@ -58,7 +58,8 @@ class Player(object):
             subpool = [c for c in pool[p:]]
             constellation = _Constellation()
 
-            while len(subpool):
+            # at least 3 remaining cheps required for combination
+            while len(subpool) > 2:
                 highest_chip = subpool[0]
                 highest_chip.status = Chip.EVALUATED
 
