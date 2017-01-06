@@ -68,7 +68,8 @@ class Chip(object):
                 (self._index << 10)
 
     def __eq__(self, other):
-        return self._color == other._color and self._value == other._value
+        return self._color == other._color and self._value == other._value and\
+                self._index == other._index
 
     def candidates(self):
         all_colors = set(range(Chip.NR_COLORS))
