@@ -48,13 +48,12 @@ class PlayerSimplePlayTestCase(unittest.TestCase):
         combi = player._yard[0]
         # algorithm picks either r987 or rby8
         self.assertEqual(24, combi.value)
-        self.assertEqual(7, len(player._hand))
+        self.assertEqual(4, len(player._hand))
 
     def test_yard_double_chip(self):
         player = Player(0, [
             Chip.from_str("y2", index=0), Chip.from_str("y3"), Chip.from_str("y4"),
             Chip.from_str("y2", index=1), Chip.from_str("r2"), Chip.from_str("k2")])
-        # import pdb; pdb.set_trace()
         player.play()
         self.assertEqual(2, len(player._yard))
         self.assertEqual(0, len(player._hand))
