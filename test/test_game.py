@@ -70,5 +70,16 @@ class PlayerSimplePlayTestCase(unittest.TestCase):
         self.assertEqual(0, len(player._yard))
         self.assertEqual(6, len(player._hand))
 
+    # def test_best_constellation(self):
+    #     player = Player(0, [
+    #         Chip.from_str("r6"), Chip.from_str("y6"), Chip.from_str("k6"),
+    #         Chip.from_str("r5"), Chip.from_str("r4"), Chip.from_str("r3"),
+    #         Chip.from_str("b9"), Chip.from_str("k7"), Chip.from_str("b1")])
+    #     Game.THRESHOLD = 15
+    #     player.play()
+    #     # the algorithm should pick r6543 since it holds more chips than ryk6
+    #     self.assertEqual(1, len(player._yard))
+    #     self.assertEqual(5, len(player._hand))
+
 if __name__ == "__main__":
     unittest.main()

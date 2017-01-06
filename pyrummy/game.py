@@ -101,18 +101,21 @@ class Player(object):
             if constellation.value >= Game.THRESHOLD:
                 constellations.add(constellation)
 
-        # TODO: best constellation is actually the one that contains most chips
-        constellations = list(constellations)
-        constellations_values = [c.value for c in constellations]
-        max_index = constellations_values.index(max(constellations_values))
+        if constellations:
+            # find best (i.e. largest) constellation among existing ones
+            constellations = list(constellations)
+            constellations_sizes = [len(list(c.combination_chips())) for c in
+                    constellations]
+            best_index = constellations_sizes.index(max(constellations_sizes))
+            best_constellation = constellations[best_index]
 
-        best_constellation = constellations[max_index]
-        self._yard.extend(best_constellation.combinations)
+            # update player yard and hand
+            self._yard.extend(best_constellation.combinations)
 
-        for c in best_constellation.combination_chips():
-            self._hand.remove(c)
+            for c in best_constellation.combination_chips():
+                self._hand.remove(c)
 
-        # TODO: determine chip to drop from constellation rest
+            # TODO: determine chip to drop from constellation rest
 
 class Game(object):
 
