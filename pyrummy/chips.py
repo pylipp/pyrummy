@@ -18,17 +18,11 @@ class Chip(object):
     POOL = 6
     YARDS = 7
 
-    # status enum indicating chip usage in combination search
-    UNUSED = 0
-    EVALUATED = 1
-    COMBINED = 2
-
     def __init__(self, color, value, location=POOL, index=0):
         self._color = color
         self._value = value
         self._location = location
         self._index = index
-        self._status = Chip.UNUSED
 
     @classmethod
     def from_str(cls, code, location=POOL, index=0):
@@ -62,14 +56,6 @@ class Chip(object):
     @location.setter
     def location(self, value):
         self._location = value
-
-    @property
-    def status(self):
-        return self._status
-
-    @status.setter
-    def status(self, value):
-        self._status = value
 
     def __hash__(self):
         return self._value + (self._color << 5) + (self._location << 7) +\
