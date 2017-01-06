@@ -51,6 +51,7 @@ class Player(object):
 
     def play(self):
         constellations = set()
+        # start with the highest chips
         pool = sorted(self._hand, key=attrgetter("value"))[::-1]
 
         for p in range(len(pool)):
@@ -60,36 +61,40 @@ class Player(object):
 
             # at least 3 remaining cheps required for combination
             while len(subpool) > 2:
+                # fetch and remove the first chip
                 highest_chip = subpool[0]
-                highest_chip.status = Chip.EVALUATED
+                subpool.remove(highest_chip)
 
+                # create list of chip candidates once to not repeat in every iteration
                 candidates = list(highest_chip.candidates())
+
                 for chip in subpool:
                     if chip.code in candidates:
-                        i = subpool.index(chip)
-                        subpool.remove(chip)
                         if chip.color == highest_chip.color:
                             pair = Run(highest_chip, chip)
                         else:
                             pair = Book(highest_chip, chip)
+
+                        # try to find 3rd chip for full combination
                         pair_candidates = list(pair.candidates())
                         combination = None
+
                         for cchip in subpool:
                             if cchip.code in pair_candidates:
-                                highest_chip.status = Chip.COMBINED
-                                chip.status = Chip.COMBINED
-                                cchip.status = Chip.COMBINED
                                 combination = pair.__class__(
                                         highest_chip, chip, cchip)
+                                subpool.remove(cchip)
+                                subpool.remove(chip)
                                 break
+
+                        # also break out of the outer for loop. If more than
+                        # one candidate for `chip` was available, it will be
+                        # found in another iteration of the outermost for-loop.
                         if combination is not None:
                             constellation.combinations.append(combination)
                             break
-                        else:
-                            subpool.insert(i, chip)
-                subpool = [c for c in subpool if c.status == Chip.UNUSED]
+
             # TODO: search rest for combinations longer than 3 chips
-            # FIXME: this needs the chip index for correctness
             constellation.rest = [c for c in pool if c not in
                     constellation.combination_chips()]
             constellations.add(constellation)
