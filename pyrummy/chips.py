@@ -78,6 +78,10 @@ class Chip(object):
             yield Chip(self._color, self._value + 1)
         if self._value > 1:
             yield Chip(self._color, self._value - 1)
+    def __repr__(self):
+        """Similar to `Chip.code()` but also shows the chip index. For
+        debugging purposes."""
+        return "{}{:02} {}".format("yrbk"[self._color], self._value, self._index)
 
 
 class Combination(object):
