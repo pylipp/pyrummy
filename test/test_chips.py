@@ -16,27 +16,27 @@ class ChipTestCase(unittest.TestCase):
         self.assertEqual(hash(chip), 842)
         self.assertEqual(chip.location, Chip.POOL)
 
+    def test_code(self):
+        chip = Chip.from_str("y1")
+        self.assertEqual(chip.code, "y01")
+
     def test_eq(self):
         self.assertEqual(Chip.from_str("Y05"), Chip(Chip.YELLOW, 5))
 
-    def test_candidates(self):
+    def test_r1_candidates(self):
         chip = Chip.from_str("r1")
-        self.assertSetEqual(set(chip.candidates()),
-                set([Chip.from_str("y1"), Chip.from_str("b1"),
-                    Chip.from_str("k1"), Chip.from_str("r2")]))
+        self.assertSetEqual(set(chip.candidates()), {"y01", "b01", "k01", "r02"})
 
-    def test_all_candidates(self):
+    def test_r2_candidates(self):
         chip = Chip.from_str("r2")
         self.assertSetEqual(set(chip.candidates()),
-                set([Chip.from_str("y2"), Chip.from_str("b2"),
-                    Chip.from_str("k2"), Chip.from_str("r3"), Chip.from_str("r1")]))
+                {"y02", "b02", "k02", "r03", "r01"})
 
 class BookTestCase(unittest.TestCase):
     def test_two_chip_book(self):
         book = Book(Chip.from_str("k11"), Chip.from_str("y11"))
-        candidates = list(book.candidates())
-        self.assertListEqual(candidates, [Chip.from_str("r11"),
-            Chip.from_str("b11")])
+        candidates = set(book.candidates())
+        self.assertSetEqual(candidates, {"r11", "b11"})
         self.assertEqual(book.value, 22)
 
     def test_four_chip_book(self):
@@ -53,8 +53,7 @@ class RunTestCase(unittest.TestCase):
     def test_candidates(self):
         run = Run(Chip.from_str("r9"), Chip.from_str("r8"), Chip.from_str("r10"))
         candidates = list(run.candidates())
-        self.assertListEqual(candidates, [Chip.from_str("r11"),
-            Chip.from_str("r7")])
+        self.assertListEqual(candidates, ["r11", "r07"])
 
     def test_no_candidates(self):
         run = Run(*[Chip(Chip.BLACK, v) for v in range(Chip.MAX_VALUE, 0, -1)])

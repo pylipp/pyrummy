@@ -63,8 +63,8 @@ class Player(object):
                 highest_chip.status = Chip.EVALUATED
 
                 candidates = list(highest_chip.candidates())
-                for chip in subpool[1:]:
-                    if chip in candidates:
+                for chip in subpool:
+                    if chip.code in candidates:
                         i = subpool.index(chip)
                         subpool.remove(chip)
                         if chip.color == highest_chip.color:
@@ -74,7 +74,7 @@ class Player(object):
                         pair_candidates = list(pair.candidates())
                         combination = None
                         for cchip in subpool:
-                            if cchip in pair_candidates:
+                            if cchip.code in pair_candidates:
                                 highest_chip.status = Chip.COMBINED
                                 chip.status = Chip.COMBINED
                                 cchip.status = Chip.COMBINED

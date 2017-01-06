@@ -40,6 +40,14 @@ class Chip(object):
         return cls(color, value, location, index)
 
     @property
+    def code(self):
+        """Returns a string representing color and value, e.g. "k08" for a black
+        8. The chip index does not matter. This function is useful if the chip
+        as a unique object is not required, i.e. when comparing a chip to
+        another chip's candidates."""
+        return "{}{:02}".format("yrbk"[self._color], self._value)
+
+    @property
     def value(self):
         return self._value
 
@@ -74,11 +82,12 @@ class Chip(object):
     def candidates(self):
         all_colors = set(range(Chip.NR_COLORS))
         for color in all_colors.difference({self._color}):
-            yield Chip(color, self._value)
+            yield Chip(color, self._value).code
         if self._value < Chip.MAX_VALUE:
-            yield Chip(self._color, self._value + 1)
+            yield Chip(self._color, self._value + 1).code
         if self._value > 1:
-            yield Chip(self._color, self._value - 1)
+            yield Chip(self._color, self._value - 1).code
+
     def __repr__(self):
         """Similar to `Chip.code()` but also shows the chip index. For
         debugging purposes."""
@@ -108,7 +117,7 @@ class Book(set, Combination):
         all_colors = set(range(Chip.NR_COLORS))
         self_colors = set([chip.color for chip in self])
         for color in all_colors.difference(self_colors):
-            yield Chip(color, self._chip_value)
+            yield Chip(color, self._chip_value).code
 
 
 class Run(deque, Combination):
@@ -119,7 +128,7 @@ class Run(deque, Combination):
 
     def candidates(self):
         if self[-1].value < Chip.MAX_VALUE:
-            yield Chip(self._chip_color, self[-1].value + 1)
+            yield Chip(self._chip_color, self[-1].value + 1).code
         if self[0].value > 1:
-            yield Chip(self._chip_color, self[0].value - 1)
+            yield Chip(self._chip_color, self[0].value - 1).code
 
