@@ -40,6 +40,12 @@ class ChipTestCase(unittest.TestCase):
         self.assertFalse(Chip.remote_candidates(Chip.from_str("r1"), Chip.from_str("r4")))
         self.assertFalse(Chip.remote_candidates(Chip.from_str("k7"), Chip.from_str("r4")))
 
+    def test_chips_from_str(self):
+        chips = set(Chip.chips_from_str("k11", "y2"))
+        self.assertSetEqual(chips,
+                set([Chip(Chip.BLACK, 11), Chip(Chip.YELLOW, 2)]))
+
+
 class BookTestCase(unittest.TestCase):
     def test_two_chip_book(self):
         book = Book(Chip.from_str("k11"), Chip.from_str("y11"))

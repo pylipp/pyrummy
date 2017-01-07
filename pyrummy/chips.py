@@ -34,6 +34,13 @@ class Chip(object):
         value = int(code[1:])
         return cls(color, value, location, index)
 
+    @staticmethod
+    def chips_from_str(*codes):
+        chips = []
+        for code in codes:
+            chips.append(Chip.from_str(code))
+        return chips
+
     @property
     def code(self):
         """Returns a string representing color and value, e.g. "k08" for a black
