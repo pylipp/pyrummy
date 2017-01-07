@@ -32,6 +32,14 @@ class ChipTestCase(unittest.TestCase):
         self.assertSetEqual(set(chip.candidates()),
                 {"y02", "b02", "k02", "r03", "r01"})
 
+    def test_remote_candidates(self):
+        self.assertTrue(Chip.remote_candidates(Chip.from_str("r2"), Chip.from_str("r4")))
+        self.assertTrue(Chip.remote_candidates(Chip.from_str("r4"), Chip.from_str("r3")))
+        self.assertTrue(Chip.remote_candidates(Chip.from_str("k4"), Chip.from_str("r4")))
+        self.assertFalse(Chip.remote_candidates(Chip.from_str("r4"), Chip.from_str("r4")))
+        self.assertFalse(Chip.remote_candidates(Chip.from_str("r1"), Chip.from_str("r4")))
+        self.assertFalse(Chip.remote_candidates(Chip.from_str("k7"), Chip.from_str("r4")))
+
 class BookTestCase(unittest.TestCase):
     def test_two_chip_book(self):
         book = Book(Chip.from_str("k11"), Chip.from_str("y11"))

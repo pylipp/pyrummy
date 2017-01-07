@@ -79,6 +79,20 @@ class Chip(object):
         debugging purposes."""
         return "{}{:02} {}".format("yrbk"[self._color], self._value, self._index)
 
+    @staticmethod
+    def remote_candidates(first, second):
+        """Evaluate whether `first` and `second` chip are remote candidates,
+        i.e. whether they could form a combination with an appropriate third
+        chip in the future. Examples for remote candidates: k2 and k4, r5 and
+        y5, but not b6 and b9, r1 and r1, k12 and b7."""
+        if first.color == second.color:
+            if 0 < abs(first.value - second.value) < 3:
+                return True
+        else:
+            if first.value == second.value:
+                return True
+        return False
+
 
 class Combination(object):
 
