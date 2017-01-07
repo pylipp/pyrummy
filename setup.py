@@ -11,7 +11,7 @@ setup(
         #classifiers=[],
         packages=find_packages(exclude=["test", "doc"]),
         entry_points = {
-            "console_scripts": ["pyrummy = pyrummy.main:main"]
+            "console_scripts": ["pyrummy = pyrummy.game:main"]
             },
         install_requires=[]
         )

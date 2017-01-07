@@ -133,5 +133,32 @@ class PoolTestCase(unittest.TestCase):
             popped_chips.add(pool.pop_random_chip())
         self.assertSetEqual(set(chips), popped_chips)
 
+class GameTestCase(unittest.TestCase):
+    def test_two_simple_players(self):
+        hands = [Chip.chips_from_str("r11", "y5", "k2"),
+                Chip.chips_from_str("k9", "r9", "b1")]
+        pool = Pool([Chip.from_str("y9", index=i) for i in range(2)])
+        game = Game(pool=pool, hands=hands)
+        Game.THRESHOLD = 25
+        # player 0 draws and drops, player 1 eventually draws y9 and wins
+        game.run()
+        self.assertEqual(1, game._current_player_index)
+        self.assertEqual(0, len(game._winner._hand))
+        self.assertEqual(3, len(game._players[0]._hand))
+
+    def test_one_complex_player(self):
+        hands = [Chip.chips_from_str(
+            "k13", "y13",
+            "r10", "y10", "b10",
+            "k1", "b1",
+            "b12", "r5")]
+        pool = Pool(Chip.chips_from_str("b13", "r1", "b3", "y7"))
+        game = Game(pool=pool, hands=hands)
+        Game.THRESHOLD = 31
+        game.run()
+        self.assertEqual(3, len(game._winner._yard))
+        self.assertSetEqual(set(pool),
+                set(Chip.chips_from_str("b3", "r5", "y7", "b12")))
+
 if __name__ == "__main__":
     unittest.main()
