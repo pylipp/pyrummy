@@ -13,6 +13,9 @@ logging.basicConfig(level=logging.DEBUG,
 
 
 class _Constellation(object):
+    """Container for chip combinations during the combination search.
+    `combinations` is a list of Books or Runs that can be formed from the given
+    chips. `rest` is a list of chips not contained in combinations."""
 
     def __init__(self):
         self.combinations = []
@@ -29,6 +32,10 @@ class _Constellation(object):
 
 
 class Player(object):
+    """Representing a Rummy player and his playing actions.
+    Every player has an individual index (integer starting from 0). A player
+    administers chips on his hand and on his yard. He holds a status indicating
+    whether the player has published any chips from his hand to his yard."""
 
     HAND_ONLY = 0
     JUST_PUBLISHED = 1
@@ -55,6 +62,8 @@ class Player(object):
         logger.debug("Player {} draws: {}".format(self._index, chip))
 
     def drop(self):
+        """Remove the designated chip from the hand and return it, s.t. it can
+        be added to the pool. Returns None if no chip is available."""
         chip = self._drop_chip
         logger.debug("Player {} drops: {}".format(self._index, chip))
         if chip is None:
@@ -65,9 +74,15 @@ class Player(object):
         return chip
 
     def play(self):
+        """Main routine. Searches for optimal constellation of hand chips,
+        publishes combinations to the yard, if possible, and determines the
+        chip to drop."""
         constellations = set()
+
         # start with the highest chips
         pool = sorted(self._hand, key=attrgetter("value"))[::-1]
+
+        # TODO: with status==PUBLISHED, take pendants from yards into account.
 
         for p in range(len(pool)):
             # copy the pool, subpool will be modified
@@ -113,6 +128,7 @@ class Player(object):
             # with status=PUBLISHED, other players' yards can be searched, too
             constellation.rest = [c for c in pool if c not in
                     constellation.combination_chips()]
+            # TODO: hash constellation
             constellations.add(constellation)
 
         # find best (i.e. largest) constellation among existing ones
@@ -140,7 +156,7 @@ class Player(object):
             logger.debug("Player {} hand: {}".format(self._index, self._hand))
             self._find_drop_chip(best_constellation.rest)
         else:
-            # constellations found, but unsufficient in value
+            # constellations found, but unsufficient in value; or none found
             constellations_values = [c.value for c in constellations]
             max_index = constellations_values.index(max(constellations_values))
             max_constellation = constellations[max_index]
@@ -150,6 +166,8 @@ class Player(object):
                 self._find_drop_chip(self._hand)
 
     def _find_drop_chip(self, chips_):
+        """Helper routine to find the chip that is most unlikely to be combined
+        with another hand chip in the future. This chip will be dropped."""
         if len(chips_) == 0:
             # FIXME In this situation, the entire hand has been formed into
             # combinations and no chip is left to drop. AFAIK dropping a chip
@@ -168,6 +186,7 @@ class Player(object):
                     break
             else:
                 # no remote candidates found, pick any of the remaining chips
+                # TODO: this should depending on player stage, see below
                 random.shuffle(chips)
                 self._drop_chip = chips[0]
                 return
@@ -181,6 +200,10 @@ class Player(object):
 
 
 class Pool(list):
+    """Container holding chips that players draw from and drop to.
+    By default, a double-deck pool is initialized, holding 2x52 chips. If a
+    list of chips is passed, the pool is created from the list. This is most
+    useful for testing."""
 
     def __init__(self, chips=None):
         if chips is None:
@@ -205,7 +228,8 @@ class Game(object):
     is created and each player are given random hands of 14 chips.
     Another option (which is particularly useful for testing) is to pass a
     custum `Pool` instance and a `hands` list that is assigns a custom hand to
-    each player."""
+    each player.
+    A game organizes all player instances, the pool and the yards."""
 
     THRESHOLD = 40
     HAND_START_SIZE = 14
@@ -238,6 +262,8 @@ class Game(object):
                 self._players[i] = Player(i, hand, self)
 
     def run(self):
+        """Main game routine. The players are taking turns with drawing,
+        playing and dropping. The first player who gets rid of his hand wins."""
         logger.info("Starting the game...")
         while True:
             current_player = self._players[self._current_player_index]

@@ -4,6 +4,9 @@ from operator import attrgetter
 
 
 class Chip(object):
+    """A chip is identified by its color (one of yellow, red, blue, black), its
+    value (ranging from 1 to 13) and its index (integer starting from 0,
+    required to distinguish chips of the same code)."""
 
     # color enum
     YELLOW = 0
@@ -66,10 +69,14 @@ class Chip(object):
         self._location = value
 
     def __hash__(self):
+        """Generate a unique bit flag for the chip. First bit indicates the
+        index, next three bits the location, next two bits the color and the
+        final 5 bits the value: ILLLCCVVVVV"""
         return self._value + (self._color << 5) + (self._location << 7) +\
                 (self._index << 10)
 
     def __eq__(self, other):
+        """Check if two chip instances are physically identical."""
         return self._color == other._color and self._value == other._value and\
                 self._index == other._index
 
