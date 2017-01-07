@@ -97,17 +97,17 @@ class Player(object):
             # TODO: search rest for combinations longer than 3 chips
             constellation.rest = [c for c in pool if c not in
                     constellation.combination_chips()]
-            # add constellation if it meets the threshold
-            if constellation.value >= Game.THRESHOLD:
-                constellations.add(constellation)
+            constellations.add(constellation)
 
-        if constellations:
-            # find best (i.e. largest) constellation among existing ones
-            constellations = list(constellations)
-            constellations_sizes = [len(list(c.combination_chips())) for c in
-                    constellations]
-            best_index = constellations_sizes.index(max(constellations_sizes))
-            best_constellation = constellations[best_index]
+        # find best (i.e. largest) constellation among existing ones
+        constellations = list(constellations)
+        constellations_sizes = [len(list(c.combination_chips())) for c in
+                constellations if c.value >= Game.THRESHOLD]
+        if constellations_sizes:
+            for best_constellation in constellations:
+                if len(list(best_constellation.combination_chips())) == \
+                        max(constellations_sizes):
+                    break
 
             # update player yard and hand
             self._yard.extend(best_constellation.combinations)
@@ -115,7 +115,12 @@ class Player(object):
             for c in best_constellation.combination_chips():
                 self._hand.remove(c)
 
-            # TODO: determine chip to drop from constellation rest
+        else:
+            # constellations found, but unsufficient in value
+            constellations_values = [c.value for c in constellations]
+            max_index = constellations_values.index(max(constellations_values))
+            max_constellation = constellations[max_index]
+
 
 class Game(object):
 
