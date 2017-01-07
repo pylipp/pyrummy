@@ -1,8 +1,15 @@
 from operator import attrgetter
 from itertools import combinations
 import random
+import logging
+import time
 
 from pyrummy.chips import Chip, Run, Book
+
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG,
+        filename="log_{}".format(int(time.time())))
 
 
 class _Constellation(object):
@@ -36,6 +43,8 @@ class Player(object):
         self._status = Player.HAND_ONLY
         self._drop_chip = None
         self._yard = []
+        logger.debug("Player {} hand: {}".format(self._index, self._hand))
+        logger.debug("Player {} yard: {}".format(self._index, self._yard))
 
     def victorious(self):
         return len(self._hand) == 0
@@ -43,9 +52,11 @@ class Player(object):
     def draw(self, chip):
         chip.location = self._index
         self._hand.append(chip)
+        logger.debug("Player {} draws: {}".format(self._index, chip))
 
     def drop(self):
         chip = self._drop_chip
+        logger.debug("Player {} drops: {}".format(self._index, chip))
         if chip is None:
             return None
         chip.location = Chip.POOL
@@ -119,6 +130,9 @@ class Player(object):
             for c in best_constellation.combination_chips():
                 self._hand.remove(c)
 
+            logger.debug("Player {} publishes: {}".format(self._index,
+                best_constellation.combinations))
+            logger.debug("Player {} hand: {}".format(self._index, self._hand))
             self._find_drop_chip(best_constellation.rest)
         else:
             # constellations found, but unsufficient in value
@@ -172,6 +186,7 @@ class Pool(list):
                         self.append(chip)
         else:
             self.extend(chips)
+        logger.debug("Pool contains: {}".format(self))
 
     def pop_random_chip(self):
         random.shuffle(self)
@@ -205,6 +220,8 @@ class Game(object):
         self._generate(hands)
 
     def _generate(self, hands):
+        logger.info("Generating game with {} player{}...".format(
+            self._nr_players, "s" if self._nr_players > 1 else ""))
         if hands is None:
             for i in range(self._nr_players):
                 hand = []
@@ -216,14 +233,17 @@ class Game(object):
                 self._players[i] = Player(i, hand, self)
 
     def run(self):
+        logger.info("Starting the game...")
         while True:
             current_player = self._players[self._current_player_index]
             current_player.draw(self._pool.pop_random_chip())
             current_player.play()
             self._pool.append(current_player.drop())
+            logger.debug("Pool contains: {}".format(self._pool))
 
             if current_player.victorious():
                 self._winner = current_player
+                logger.info("Player {} wins!".format(self._current_player_index))
                 break
 
             self._current_player_index = (self._current_player_index + 1) %\
