@@ -81,5 +81,38 @@ class PlayerSimplePlayTestCase(unittest.TestCase):
     #     self.assertEqual(1, len(player._yard))
     #     self.assertEqual(5, len(player._hand))
 
+class PlayerFindDropChipTestCase(unittest.TestCase):
+    def test_find_from_three(self):
+        chips = [Chip.from_str("r9"), Chip.from_str("r8"), Chip.from_str("k5")]
+        player = Player(0, chips)
+        player.play()
+        self.assertEqual(player._drop_chip, Chip.from_str("k5"))
+
+    def test_find_from_two(self):
+        chips = [Chip.from_str("r8"), Chip.from_str("k5")]
+        player = Player(0, chips)
+        player.play()
+        self.assertTrue(player._drop_chip in chips)
+
+    def test_find_from_one(self):
+        chip = Chip.from_str("k12")
+        player = Player(0, [chip])
+        player.play()
+        self.assertEqual(player._drop_chip, chip)
+
+    def test_find_from_four(self):
+        chips = [Chip.from_str("r9"), Chip.from_str("y9"),
+                Chip.from_str("k5"), Chip.from_str("k4")]
+        player = Player(0, chips)
+        player.play()
+        self.assertEqual(player._drop_chip, Chip.from_str("k4"))
+
+    def test_find_from_combination(self):
+        chips = [Chip.from_str("r10"), Chip.from_str("y10"), Chip.from_str("b10")]
+        player = Player(0, chips)
+        Game.THRESHOLD = 30
+        player.play()
+        self.assertIsNone(player._drop_chip)
+
 if __name__ == "__main__":
     unittest.main()

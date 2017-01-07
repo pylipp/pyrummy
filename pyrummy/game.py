@@ -1,5 +1,6 @@
 from operator import attrgetter
-from itertools import chain
+from itertools import combinations
+import random
 
 from pyrummy.chips import Chip, Run, Book
 
@@ -44,6 +45,8 @@ class Player(object):
 
     def drop(self):
         chip = self._drop_chip
+        if chip is None:
+            return None
         chip.location = Chip.POOL
         self._hand.remove(chip)
         self._drop_chip = None
@@ -115,11 +118,46 @@ class Player(object):
             for c in best_constellation.combination_chips():
                 self._hand.remove(c)
 
+            self._find_drop_chip(best_constellation.rest)
         else:
             # constellations found, but unsufficient in value
             constellations_values = [c.value for c in constellations]
             max_index = constellations_values.index(max(constellations_values))
             max_constellation = constellations[max_index]
+            if max_constellation.value > 2:
+                self._find_drop_chip(max_constellation.rest)
+            else:
+                self._find_drop_chip(self._hand)
+
+    def _find_drop_chip(self, chips_):
+        if len(chips_) == 0:
+            # FIXME In this situation, the entire hand has been formed into
+            # combinations and no chip is left to drop. AFAIK dropping a chip
+            # at the end of a player's turn is mandatory, so the combinations
+            # would have to be ripped apart in order to find a chip to drop.
+            # For now, this scenario is ignored and a player can win without
+            # dropped a final chip.
+            self._drop_chip = None
+            return
+        chips = chips_[:]
+        while len(chips) > 1:
+            for pair in combinations(chips, 2):
+                if Chip.remote_candidates(*pair):
+                    chips.remove(pair[0])
+                    chips.remove(pair[1])
+                    break
+            else:
+                # no remote candidates found, pick any of the remaining chips
+                random.shuffle(chips)
+                self._drop_chip = chips[0]
+                return
+        if len(chips) == 1:
+            self._drop_chip = chips[0]
+
+        # all chips are remote candidates, pick the smallest one
+        # TODO this could be adjusted to the stage of the player (about to
+        # publish, or trying to finish).
+        self._drop_chip = sorted(chips_, key=attrgetter("value"))[0]
 
 
 class Game(object):
