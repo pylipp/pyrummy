@@ -11,6 +11,7 @@ class Chip(object):
     BLUE = 2
     BLACK = 3
     NR_COLORS = 4
+    COLOR_CODES = "yrbk"
 
     MIN_VALUE = 1
     MAX_VALUE = 13
@@ -29,8 +30,7 @@ class Chip(object):
     def from_str(cls, code, location=POOL, index=0):
         """Convenience method for quickly generating a Chip from a string code,
         f.i. 'y9', 'Y9', 'y09' or 'Y09' for a yellow nine."""
-        color_codes = "yrbk"
-        color = color_codes.find(code[0].lower())
+        color = cls.COLOR_CODES.find(code[0].lower())
         value = int(code[1:])
         return cls(color, value, location, index)
 
@@ -40,7 +40,7 @@ class Chip(object):
         8. The chip index does not matter. This function is useful if the chip
         as a unique object is not required, i.e. when comparing a chip to
         another chip's candidates."""
-        return "{}{:02}".format("yrbk"[self._color], self._value)
+        return "{}{:02}".format(self.COLOR_CODES[self._color], self._value)
 
     @property
     def value(self):
