@@ -12,6 +12,7 @@ class Chip(object):
     BLACK = 3
     NR_COLORS = 4
 
+    MIN_VALUE = 1
     MAX_VALUE = 13
 
     # location enum; 0-5 indicate player hand
@@ -71,7 +72,7 @@ class Chip(object):
             yield Chip(color, self._value).code
         if self._value < Chip.MAX_VALUE:
             yield Chip(self._color, self._value + 1).code
-        if self._value > 1:
+        if self._value > Chip.MIN_VALUE:
             yield Chip(self._color, self._value - 1).code
 
     def __repr__(self):
@@ -129,6 +130,6 @@ class Run(deque, Combination):
     def candidates(self):
         if self[-1].value < Chip.MAX_VALUE:
             yield Chip(self._chip_color, self[-1].value + 1).code
-        if self[0].value > 1:
+        if self[0].value > Chip.MIN_VALUE:
             yield Chip(self._chip_color, self[0].value - 1).code
 
