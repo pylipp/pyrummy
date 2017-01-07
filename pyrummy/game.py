@@ -110,6 +110,7 @@ class Player(object):
                             break
 
             # TODO: search rest for combinations longer than 3 chips
+            # with status=PUBLISHED, other players' yards can be searched, too
             constellation.rest = [c for c in pool if c not in
                     constellation.combination_chips()]
             constellations.add(constellation)
@@ -117,7 +118,8 @@ class Player(object):
         # find best (i.e. largest) constellation among existing ones
         constellations = list(constellations)
         constellations_sizes = [len(list(c.combination_chips())) for c in
-                constellations if c.value >= Game.THRESHOLD]
+                constellations if c.value >= Game.THRESHOLD or
+                (self._status > Player.HAND_ONLY and c.value > 0)]
         if constellations_sizes:
             for best_constellation in constellations:
                 if len(list(best_constellation.combination_chips())) == \
@@ -129,6 +131,9 @@ class Player(object):
 
             for c in best_constellation.combination_chips():
                 self._hand.remove(c)
+
+            if self._status == Player.HAND_ONLY:
+                self._status = Player.PUBLISHED
 
             logger.debug("Player {} publishes: {}".format(self._index,
                 best_constellation.combinations))
