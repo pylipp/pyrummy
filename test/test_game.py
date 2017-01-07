@@ -1,7 +1,7 @@
 import unittest
 
 from pyrummy.chips import Chip, Book
-from pyrummy.game import Player, Game
+from pyrummy.game import Player, Game, Pool
 
 
 class PlayerInitTestCase(unittest.TestCase):
@@ -113,6 +113,25 @@ class PlayerFindDropChipTestCase(unittest.TestCase):
         Game.THRESHOLD = 30
         player.play()
         self.assertIsNone(player._drop_chip)
+
+class PoolTestCase(unittest.TestCase):
+    def test_default_generation(self):
+        pool = Pool()
+        self.assertEqual(len(pool),
+                (Chip.MAX_VALUE + 1 - Chip.MIN_VALUE) * Chip.NR_COLORS * 2)
+
+    def test_custom_generation(self):
+        pool = Pool([Chip(Chip.BLUE, 4, index=i) for i in range(5)])
+        self.assertEqual(len(pool), 5)
+        self.assertEqual(Chip(Chip.BLUE, 4).code, pool.pop_random_chip().code)
+
+    def test_pop_all(self):
+        chips = [Chip.from_str("r1"), Chip.from_str("y2")]
+        pool = Pool(chips)
+        popped_chips = set()
+        while len(pool):
+            popped_chips.add(pool.pop_random_chip())
+        self.assertSetEqual(set(chips), popped_chips)
 
 if __name__ == "__main__":
     unittest.main()

@@ -160,6 +160,23 @@ class Player(object):
         self._drop_chip = sorted(chips_, key=attrgetter("value"))[0]
 
 
+class Pool(list):
+
+    def __init__(self, chips=None):
+        if chips is None:
+            for value in range(Chip.MIN_VALUE, Chip.MAX_VALUE+1):
+                for color in range(Chip.NR_COLORS):
+                    for index in range(2):
+                        chip = Chip(color, value, index=index)
+                        self.append(chip)
+        else:
+            self.extend(chips)
+
+    def pop_random_chip(self):
+        random.shuffle(self)
+        return self.pop()
+
+
 class Game(object):
 
     THRESHOLD = 40
